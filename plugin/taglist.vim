@@ -2623,7 +2623,7 @@ function! s:Tlist_Window_Toggle()
     " set
     if !g:Tlist_GainFocus_On_ToggleOpen
         let prev_win = bufwinnr(current_buf)
-        exe prev_win . 'wincmd w'
+        call s:Tlist_Exe_Cmd_No_Acmds(prev_win . 'wincmd w')
     endif
 
     " Update the taglist menu
