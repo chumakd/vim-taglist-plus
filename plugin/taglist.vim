@@ -2517,11 +2517,14 @@ function! s:Tlist_Window_Close()
     endif
 
     if winnr() == winnum
-        " Already in the taglist window. Close it and return
+        " Already in the taglist window. Close it and return.
+        " Store the buffer that was selected prior to the taglist buffer
+        let prev_buf = bufnr('#')
         if winbufnr(2) != -1
             " If a window other than the taglist window is open,
             " then only close the taglist window.
             close
+            call s:Tlist_Exe_Cmd_No_Acmds(bufwinnr(prev_buf) . 'wincmd w')
         endif
     else
         " Goto the taglist window, close it and then come back to the
