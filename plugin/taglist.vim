@@ -2783,13 +2783,15 @@ endfunction
 " Extract the tag scope from the tag text
 function! s:Tlist_Extract_Tag_Scope(tag_line)
     let start = match(a:tag_line, 'line\(no\)\?:')
-    let end = strridx(a:tag_line, "\t")
+    let end = stridx(a:tag_line, "\t", start)
     if end <= start
         return ''
     endif
 
     let tag_scope = strpart(a:tag_line, end + 1)
-    let tag_scope = strpart(tag_scope, stridx(tag_scope, ':') + 1)
+    let tag_scope_start = stridx(tag_scope, ':') + 1
+    let tag_scope_end = stridx(tag_scope, "\t")
+    let tag_scope = strpart(tag_scope, tag_scope_start, tag_scope_end - tag_scope_start)
 
     return tag_scope
 endfunction
