@@ -417,7 +417,7 @@ let s:tlist_def_java_settings = 'java;p:package;c:class;i:interface;' .
                               \ 'f:field;m:method'
 
 " javascript language
-let s:tlist_def_javascript_settings = 'javascript;f:function'
+let s:tlist_def_javascript_settings = 'javascript;f:function;v:variable'
 
 " lisp language
 let s:tlist_def_lisp_settings = 'lisp;f:function'
@@ -2121,7 +2121,7 @@ function! s:Tlist_Get_Tag_Linenum(fidx, tidx)
 
     " Parse and extract the tag line number
     let tag_line = s:tlist_{a:fidx}_{a:tidx}_tag
-    let start = strridx(tag_line, 'line:') + 5
+    let start = match(tag_line, 'line\(no\)\?:') + 5
     let end = strridx(tag_line, "\t")
     if end < start
         let {tline_var} = strpart(tag_line, start) + 0
@@ -2773,7 +2773,7 @@ function! s:Tlist_Extract_Tagtype(tag_line)
     " ends with the /;"\t string. We add 4 at the end to skip the characters
     " in this special string..
     let start = strridx(a:tag_line, '/;"' . "\t") + 4
-    let end = strridx(a:tag_line, 'line:') - 1
+    let end = match(a:tag_line,  'line\(no\)\?:') - 1
     let ttype = strpart(a:tag_line, start, end - start)
 
     return ttype
@@ -2782,7 +2782,7 @@ endfunction
 " Tlist_Extract_Tag_Scope
 " Extract the tag scope from the tag text
 function! s:Tlist_Extract_Tag_Scope(tag_line)
-    let start = strridx(a:tag_line, 'line:')
+    let start = match(a:tag_line, 'line\(no\)\?:')
     let end = strridx(a:tag_line, "\t")
     if end <= start
         return ''
