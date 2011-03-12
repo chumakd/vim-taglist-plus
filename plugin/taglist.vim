@@ -418,6 +418,12 @@ let s:tlist_def_java_settings = 'java;p:package;c:class;i:interface;' .
 
 " javascript language
 let s:tlist_def_javascript_settings = 'javascript;f:function;v:variable'
+if !exists('Tlist_javascript_Ctags_Cmd') && executable('jsctags')
+    let Tlist_javascript_Ctags_Cmd = 'jsctags'
+endif
+if !exists('Tlist_javascript_Show_Extras')
+    let Tlist_javascript_Show_Extras = ['namespace', 'type']
+endif
 
 " lisp language
 let s:tlist_def_lisp_settings = 'lisp;f:function'
@@ -1451,7 +1457,8 @@ function! s:Tlist_Window_Init()
     syntax match TagListComment '^" .*'
     syntax match TagListFileName '^[^" ].*$'
     syntax match TagListTitle '^  \S.*$'
-    syntax match TagListTagScope  '\s\[.\{-\}\]$'
+    syntax match TagListTagScope1  '\s\[[^]]*\]' nextgroup=TagListTagScope2 skipwhite
+    syntax match TagListTagScope2  '\s\[.\{-\}\]' contained
 
     " Define the highlighting only if colors are supported
     if has('gui_running') || &t_Co > 2
@@ -1484,10 +1491,12 @@ function! s:Tlist_Window_Init()
                         \ guifg=white ctermfg=white
         endif
         if hlexists('MyTagListTagScope')
-            highlight link TagListTagScope MyTagListTagScope
+            highlight link TagListTagScope1 MyTagListTagScope
         else
-            highlight clear TagListTagScope
-            highlight default link TagListTagScope Identifier
+            highlight clear TagListTagScope1
+            highlight clear TagListTagScope2
+            highlight default link TagListTagScope1 Identifier
+            highlight default link TagListTagScope2 Keyword
         endif
     else
         highlight default TagListTagName term=reverse cterm=reverse
@@ -2139,7 +2148,7 @@ endfunction
 "
 "     tag_name<TAB>file_name<TAB>ex_cmd;"<TAB>extension_fields
 "
-function! s:Tlist_Parse_Tagline(tag_line)
+function! s:Tlist_Parse_Tagline(tag_line,ftype)
     if a:tag_line == ''
         " Skip empty lines
         return
@@ -2186,10 +2195,12 @@ function! s:Tlist_Parse_Tagline(tag_line)
         " Add the tag scope, if it is available and is configured. Tag
         " scope is the last field after the 'line:<num>\t' field
         if g:Tlist_Display_Tag_Scope
-            let tag_scope = s:Tlist_Extract_Tag_Scope(a:tag_line)
-            if tag_scope != ''
-                let ttxt = ttxt . ' [' . tag_scope . ']'
-            endif
+            let tag_scopes = s:Tlist_Extract_Tag_Scope(a:tag_line)
+            for [extradata_name, extradata_content] in items(tag_scopes)
+                if !exists('g:Tlist_{a:ftype}_Show_Extras') || match(g:Tlist_{a:ftype}_Show_Extras, extradata_name) != -1
+                    let ttxt = ttxt . ' [' . extradata_content . ']'
+                endif
+            endfor
         endif
     endif
 
@@ -2246,7 +2257,11 @@ function! s:Tlist_Process_File(filename, ftype)
     let ctags_args = ctags_args . ' ' . s:tlist_{a:ftype}_ctags_args
 
     " Ctags command to produce output with regexp for locating the tags
-    let ctags_cmd = g:Tlist_Ctags_Cmd . ctags_args
+    if exists('g:Tlist_{a:ftype}_Ctags_Cmd')
+        let ctags_cmd = g:Tlist_{a:ftype}_Ctags_Cmd . ' -f -'
+    else
+        let ctags_cmd = g:Tlist_Ctags_Cmd . ctags_args
+    endif
     let ctags_cmd = ctags_cmd . ' "' . a:filename . '"'
 
     if &shellxquote == '"'
@@ -2330,7 +2345,7 @@ function! s:Tlist_Process_File(filename, ftype)
         " command is used to parse the tag lines instead of using the
         " matchstr()/stridx()/strpart() functions for performance reason
         call substitute(cmd_output, "\\([^\n]\\+\\)\n",
-                    \ '\=s:Tlist_Parse_Tagline(submatch(1))', 'g')
+                    \ '\=s:Tlist_Parse_Tagline(submatch(1),a:ftype)', 'g')
 
         " Save the number of tags for this file
         let s:tlist_{fidx}_tag_count = s:tidx
@@ -2401,10 +2416,12 @@ function! s:Tlist_Process_File(filename, ftype)
                 " Add the tag scope, if it is available and is configured. Tag
                 " scope is the last field after the 'line:<num>\t' field
                 if g:Tlist_Display_Tag_Scope
-                    let tag_scope = s:Tlist_Extract_Tag_Scope(one_line)
-                    if tag_scope != ''
-                        let ttxt = ttxt . ' [' . tag_scope . ']'
-                    endif
+                    let tag_scopes = s:Tlist_Extract_Tag_Scope(a:tag_line)
+                    for [extradata_name, extradata_content] in items(tag_scopes)
+                        if !exists('g:Tlist_{a:ftype}_Show_Extras') || match(g:Tlist_{a:ftype}_Show_Extras, extradata_name) != -1
+                            let ttxt = ttxt . ' [' . extradata_content . ']'
+                        endif
+                    endfor
                 endif
             endif
 
@@ -2785,15 +2802,26 @@ function! s:Tlist_Extract_Tag_Scope(tag_line)
     let start = match(a:tag_line, 'line\(no\)\?:')
     let end = stridx(a:tag_line, "\t", start)
     if end <= start
-        return ''
+        return {}
     endif
 
-    let tag_scope = strpart(a:tag_line, end + 1)
-    let tag_scope_start = stridx(tag_scope, ':') + 1
-    let tag_scope_end = stridx(tag_scope, "\t")
-    let tag_scope = strpart(tag_scope, tag_scope_start, tag_scope_end - tag_scope_start)
+    let tag_extras = {}
 
-    return tag_scope
+    let tag_extra = strpart(a:tag_line, end + 1)
+    while tag_extra != ''
+        let tag_extra_separator_start = stridx(tag_extra, ':')
+        let tag_extra_content_start = tag_extra_separator_start + 1
+        let tag_extra_content_end = stridx(tag_extra, "\t")
+        if tag_extra_content_end == -1
+            let tag_extra_content_end = strlen(tag_extra)
+        endif
+        let tag_extra_name = strpart(tag_extra, 0, tag_extra_separator_start)
+        let tag_extra_content = strpart(tag_extra, tag_extra_content_start, tag_extra_content_end - tag_extra_content_start)
+        let tag_extras[tag_extra_name] = tag_extra_content
+        let tag_extra = strpart(tag_extra, tag_extra_content_end + 1)
+    endwhile
+
+    return tag_extras
 endfunction
 
 " Tlist_Refresh()
