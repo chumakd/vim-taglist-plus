@@ -2852,8 +2852,12 @@ function! s:Tlist_Window_Toggle_Extra(ftype, extra_name)
     if s:auto_width
         let g:Tlist_WinWidth = 30
     endif
+
+    let cur_lnum = line('.')
+    let cur_col = col('.')
     call s:Tlist_Window_Update_File()
     call s:Tlist_Window_Check_Width()
+    call cursor(cur_lnum, cur_col)
 endfunction
 
 " Tlist_Refresh()
