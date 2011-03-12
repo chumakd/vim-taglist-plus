@@ -1457,8 +1457,8 @@ function! s:Tlist_Window_Init()
     syntax match TagListComment '^" .*'
     syntax match TagListFileName '^[^" ].*$'
     syntax match TagListTitle '^  \S.*$'
-    syntax match TagListTagScope1  '\s\[[^]]*\]' nextgroup=TagListTagScope2 skipwhite
-    syntax match TagListTagScope2  '\s\[.\{-\}\]' contained
+    syntax region TagListTagScope1  start='\[' end='\]' contains=TagListTagScope1 nextgroup=TagListTagScope2 skipwhite
+    syntax region TagListTagScope2 start='\[' end='\]' contained contains=TaglistTagScope2
 
     " Define the highlighting only if colors are supported
     if has('gui_running') || &t_Co > 2
