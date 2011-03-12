@@ -2205,12 +2205,7 @@ function! s:Tlist_Parse_Tagline(tag_line,ftype)
         " Add the tag scope, if it is available and is configured. Tag
         " scope is the last field after the 'line:<num>\t' field
         if g:Tlist_Display_Tag_Scope
-            let tag_scopes = s:Tlist_Extract_Tag_Scope(a:tag_line)
-            for [extradata_name, extradata_content] in items(tag_scopes)
-                if !exists('g:Tlist_{a:ftype}_Show_Extras') || match(g:Tlist_{a:ftype}_Show_Extras, extradata_name) != -1
-                    let ttxt = ttxt . ' [' . extradata_content . ']'
-                endif
-            endfor
+            let ttxt .= s:Tlist_Get_Scope_String(a:tag_line, a:ftype)
         endif
     endif
 
@@ -2224,6 +2219,17 @@ function! s:Tlist_Parse_Tagline(tag_line,ftype)
 
     " Save the tag name
     let {fidx_tidx}_tag_name = tag_name
+endfunction
+
+function! s:Tlist_Get_Scope_String(tag_line, ftype)
+    let ttxt = ''
+    let tag_scopes = s:Tlist_Extract_Tag_Scope(a:tag_line)
+    for [extradata_name, extradata_content] in items(tag_scopes)
+        if !exists('g:Tlist_{a:ftype}_Show_Extras') || match(g:Tlist_{a:ftype}_Show_Extras, extradata_name) != -1
+            let ttxt = ttxt . ' [' . extradata_content . ']'
+        endif
+    endfor
+    return ttxt
 endfunction
 
 " Tlist_Process_File
@@ -2431,12 +2437,7 @@ function! s:Tlist_Process_File(filename, ftype)
                 " Add the tag scope, if it is available and is configured. Tag
                 " scope is the last field after the 'line:<num>\t' field
                 if g:Tlist_Display_Tag_Scope
-                    let tag_scopes = s:Tlist_Extract_Tag_Scope(a:tag_line)
-                    for [extradata_name, extradata_content] in items(tag_scopes)
-                        if !exists('g:Tlist_{a:ftype}_Show_Extras') || match(g:Tlist_{a:ftype}_Show_Extras, extradata_name) != -1
-                            let ttxt = ttxt . ' [' . extradata_content . ']'
-                        endif
-                    endfor
+                    let ttxt .= s:Tlist_Get_Scope_String(a:tag_line, a:ftype)
                 endif
             endif
 
