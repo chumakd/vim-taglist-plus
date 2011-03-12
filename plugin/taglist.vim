@@ -155,6 +155,9 @@ if !exists('loaded_taglist')
     " Vertically split taglist window width setting
     if !exists('Tlist_WinWidth')
         let Tlist_WinWidth = 30
+    elseif Tlist_WinWidth == 'auto'
+        let Tlist_WinWidth = 30
+        let s:auto_width = 1
     endif
 
     " Horizontally split taglist window height setting
@@ -1776,6 +1779,10 @@ function! s:Tlist_Window_Refresh()
         silent! %foldclose
     endif
 
+    if !g:Tlist_Use_Horiz_Window && s:auto_width
+        exe 'vertical resize '.g:Tlist_WinWidth
+    endif
+
     " Move the cursor to the top of the taglist window
     normal! gg
 endfunction
@@ -2202,6 +2209,11 @@ function! s:Tlist_Parse_Tagline(tag_line,ftype)
                 endif
             endfor
         endif
+    endif
+
+    if !g:Tlist_Use_Horiz_Window && s:auto_width
+        " Add 3 for the fold columns
+        let g:Tlist_WinWidth = max([g:Tlist_WinWidth, strlen(ttxt)+3])
     endif
 
     " Add this tag to the tag type variable
