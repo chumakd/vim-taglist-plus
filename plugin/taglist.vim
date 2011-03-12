@@ -2140,8 +2140,10 @@ function! s:Tlist_Get_Tag_Linenum(fidx, tidx)
 
     " Parse and extract the tag line number
     let tag_line = s:tlist_{a:fidx}_{a:tidx}_tag
-    let start = match(tag_line, 'line\(no\)\?:') + 5
-    let end = strridx(tag_line, "\t")
+    let start = match(tag_line, 'line\(no\)\?:')
+    let start = stridx(tag_line, ':', start) + 1
+    let end = stridx(tag_line, "\t", start)
+
     if end < start
         let {tline_var} = strpart(tag_line, start) + 0
     else
