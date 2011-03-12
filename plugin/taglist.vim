@@ -1562,6 +1562,9 @@ function! s:Tlist_Window_Init()
     " Create buffer local mappings for jumping to the tags and sorting the list
     nnoremap <buffer> <silent> <CR>
                 \ :call <SID>Tlist_Window_Jump_To_Tag('useopen')<CR>
+    " If more languages are required, generate this from a list of options
+    nnoremap <buffer> <silent> m
+                \ :call <SID>Tlist_Window_Toggle_Extra('javascript', 'type')<CR>
     nnoremap <buffer> <silent> o
                 \ :call <SID>Tlist_Window_Jump_To_Tag('newwin')<CR>
     nnoremap <buffer> <silent> p
@@ -2834,6 +2837,20 @@ function! s:Tlist_Extract_Tag_Scope(tag_line)
     endwhile
 
     return tag_extras
+endfunction
+
+function! s:Tlist_Window_Toggle_Extra(ftype, extra_name)
+    let index = index(g:Tlist_{a:ftype}_Show_Extras, a:extra_name)
+    if index == -1
+        call add(g:Tlist_{a:ftype}_Show_Extras, a:extra_name)
+    else
+        unlet g:Tlist_{a:ftype}_Show_Extras[index]
+    endif
+    if s:auto_width
+        let g:Tlist_WinWidth = 30
+    endif
+    call s:Tlist_Window_Update_File()
+    call s:Tlist_Window_Check_Width()
 endfunction
 
 " Tlist_Refresh()
