@@ -424,6 +424,7 @@ let s:tlist_def_javascript_settings = 'javascript;f:function;v:variable'
 if !exists('Tlist_javascript_Ctags_Cmd') && executable('jsctags')
     let Tlist_javascript_Ctags_Cmd = 'jsctags'
 endif
+let Tlist_javascript_Ctags_Allowed_Flags = ['-f', '--sort']
 if !exists('Tlist_javascript_Show_Extras')
     let Tlist_javascript_Show_Extras = ['namespace', 'type']
 endif
@@ -950,8 +951,8 @@ function! s:Tlist_FileType_Init(ftype)
         let ctags_flags = ctags_flags . flag
     endwhile
 
-    let s:tlist_{a:ftype}_ctags_args = '--language-force=' . ctags_ftype .
-                            \ ' --' . ctags_ftype . '-types=' . ctags_flags
+    let s:tlist_{a:ftype}_ctags_args = { '--language-force=': ctags_ftype,
+                            \ '--': ctags_ftype, '-types=': ctags_flags }
     let s:tlist_{a:ftype}_count = cnt
     let s:tlist_{a:ftype}_ctags_flags = ctags_flags
 
@@ -2267,24 +2268,26 @@ function! s:Tlist_Process_File(filename, ftype)
     let s:tlist_{fidx}_valid = 1
 
     " Exuberant ctags arguments to generate a tag list
-    let ctags_args = ' -f - --format=2 --excmd=pattern --fields=nks '
+    let ctags_args = { '-f': ' -', '--format=': '2', '--excmd=': 'pattern', '--fields=': 'nks' }
 
     " Form the ctags argument depending on the sort type
     if s:tlist_{fidx}_sort_type == 'name'
-        let ctags_args = ctags_args . '--sort=yes'
+        let ctags_args['--sort'] = '=yes'
     else
-        let ctags_args = ctags_args . '--sort=no'
+        let ctags_args['--sort'] = '=no'
     endif
 
     " Add the filetype specific arguments
-    let ctags_args = ctags_args . ' ' . s:tlist_{a:ftype}_ctags_args
+    call extend(ctags_args, s:tlist_{a:ftype}_ctags_args)
 
     " Ctags command to produce output with regexp for locating the tags
     if exists('g:Tlist_{a:ftype}_Ctags_Cmd')
-        let ctags_cmd = g:Tlist_{a:ftype}_Ctags_Cmd . ' -f -'
+        let ctags_cmd = g:Tlist_{a:ftype}_Ctags_Cmd
+        let ctags_args = filter(ctags_args, 'match(g:Tlist_javascript_Ctags_Allowed_Flags, "^".v:key."$") != -1')
     else
-        let ctags_cmd = g:Tlist_Ctags_Cmd . ctags_args
+        let ctags_cmd = g:Tlist_Ctags_Cmd
     endif
+    let ctags_cmd = ctags_cmd . ' ' . join(values(map(ctags_args, 'v:key . v:val')))
     let ctags_cmd = ctags_cmd . ' "' . a:filename . '"'
 
     if &shellxquote == '"'
