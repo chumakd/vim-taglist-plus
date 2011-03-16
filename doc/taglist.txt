@@ -970,6 +970,9 @@ changed by modifying the 'Tlist_WinWidth' variable:
 >
 	let Tlist_WinWidth = 20
 <
+Setting Tlist_WinWidth to 'auto' causes the taglist window to resize
+automatically to fit the contents.
+
 Note that the value of the |'winwidth'| option setting determines the minimum
 width of the current window. If you set the 'Tlist_WinWidth' variable to a
 value less than that of the |'winwidth'| option setting, then Vim will use the
