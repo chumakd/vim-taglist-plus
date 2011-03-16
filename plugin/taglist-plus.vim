@@ -1,8 +1,10 @@
-" File: taglist.vim
-" Author: Yegappan Lakshmanan (yegappan AT yahoo DOT com)
-" Version: 4.5
-" Last Modified: September 21, 2007
-" Copyright: Copyright (C) 2002-2007 Yegappan Lakshmanan
+" File: taglist-plus.vim
+" Authors: Jezreel Ng (jezreel AT gmail DOT com)
+"          Yegappan Lakshmanan (yegappan AT yahoo DOT com)
+" Version: 1.0
+ "Last Modified: March 16, 2011
+ "Copyright: Copyright (C) 2011 Jezeel Ng
+"            Copyright (C) 2002-2007 Yegappan Lakshmanan
 "            Permission is hereby granted to use and distribute this code,
 "            with or without modifications, provided that this copyright
 "            notice is copied with it. Like anything else that's free,
@@ -10,20 +12,6 @@
 "            kind, either expressed or implied. In no event will the copyright
 "            holder be liable for any damamges resulting from the use of this
 "            software.
-"
-" The "Tag List" plugin is a source code browser plugin for Vim and provides
-" an overview of the structure of the programming language files and allows
-" you to efficiently browse through source code files for different
-" programming languages.  You can visit the taglist plugin home page for more
-" information:
-"
-"       http://vim-taglist.sourceforge.net
-"
-" You can subscribe to the taglist mailing list to post your questions
-" or suggestions for improvement or to report bugs. Visit the following
-" page for subscribing to the mailing list:
-"
-"       http://groups.yahoo.com/group/taglist/
 "
 " For more information about using this plugin, after installing the
 " taglist plugin, use the ":help taglist" command.
@@ -35,8 +23,8 @@
 "    unzip the following two files (the directory structure should be
 "    preserved):
 "
-"       plugin/taglist.vim - main taglist plugin file
-"       doc/taglist.txt    - documentation (help) file
+"       plugin/taglist-plus.vim - main taglist plugin file
+"       doc/taglist-plus.txt    - documentation (help) file
 "
 "    Refer to the 'add-plugin', 'add-global-plugin' and 'runtimepath'
 "    Vim help pages for more details about installing Vim plugins.
