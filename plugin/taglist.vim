@@ -2028,6 +2028,10 @@ function! s:Tlist_Window_Refresh_File(filename, ftype)
     endif
     call s:Tlist_Window_Update_Line_Offsets(fidx + 1, 1, end - start + 1)
 
+    if !g:Tlist_Use_Horiz_Window && s:auto_width
+        exe 'vertical resize '.g:Tlist_WinWidth
+    endif
+
     " Now that we have updated the taglist window, update the tags
     " menu (if present)
     if g:Tlist_Show_Menu
@@ -2367,6 +2371,11 @@ function! s:Tlist_Process_File(filename, ftype)
         let s:ctags_flags = s:tlist_{a:ftype}_ctags_flags
         let s:fidx = fidx
         let s:tidx = 0
+
+        " Tlist_Parse_Tagline will adjust this accordingly
+        if !g:Tlist_Use_Horiz_Window && s:auto_width
+            let g:Tlist_WinWidth = 0
+        endif
 
         " Process the ctags output one line at a time.  The substitute()
         " command is used to parse the tag lines instead of using the
