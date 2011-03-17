@@ -6,6 +6,8 @@ This is a fork of the popular taglist.vim plugin.
 Taglist-plus provides excellent Javascript support via jsctags. See [here][1]
 for examples.
 
+This plugin can also be obtained through [vim.org][2].
+
 Installation
 ------------
 
