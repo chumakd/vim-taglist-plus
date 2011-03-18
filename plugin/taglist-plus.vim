@@ -143,6 +143,7 @@ if !exists('loaded_taglist')
     " Vertically split taglist window width setting
     if !exists('Tlist_WinWidth')
         let Tlist_WinWidth = 30
+        let s:auto_width = 0
     elseif Tlist_WinWidth == 'auto'
         let Tlist_WinWidth = 30
         let s:auto_width = 1
