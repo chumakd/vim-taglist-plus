@@ -6,6 +6,10 @@ This is a fork of the popular taglist.vim plugin.
 Taglist-plus provides excellent Javascript support via jsctags. See [here][1]
 for examples.
 
+The filetype detection has also been improved: it now supports composed filetypes.
+For instance, the _php.symfony_ filetype will be split and only its first part will
+be considered.
+
 This plugin can also be obtained through [vim.org][2].
 
 Installation
