@@ -2274,7 +2274,7 @@ function! s:Tlist_Process_File(filename, ftype)
     " Ctags command to produce output with regexp for locating the tags
     if exists('g:Tlist_{a:ftype}_Ctags_Cmd')
         let ctags_cmd = g:Tlist_{a:ftype}_Ctags_Cmd
-        let ctags_args = filter(ctags_args, 'match(g:Tlist_javascript_Ctags_Allowed_Flags, "^".v:key."$") != -1')
+        let ctags_args = filter(ctags_args, 'match(g:Tlist_{a:ftype}_Ctags_Allowed_Flags, "^".v:key."$") != -1')
     else
         let ctags_cmd = g:Tlist_Ctags_Cmd
     endif
