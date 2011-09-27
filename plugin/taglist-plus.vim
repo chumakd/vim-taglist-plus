@@ -952,6 +952,17 @@ function! s:Tlist_FileType_Init(ftype)
     return 1
 endfunction
 
+" Tlist_Fix_Ftype
+" If the filetype is composed (foo.bar), only the part before the dot
+" will be returned
+function! s:Tlist_Fix_Ftype(raw_ftype)
+    if match(a:raw_ftype, '\.')
+        return split(a:raw_ftype, '\.')[0]
+    else
+        return a:raw_ftype
+    endif
+endfunction
+
 " Tlist_Detect_Filetype
 " Determine the filetype for the specified file using the filetypedetect
 " autocmd.
@@ -974,7 +985,7 @@ function! s:Tlist_Detect_Filetype(fname)
     let &filetype = old_filetype
     let &eventignore = old_eventignore
 
-    return ftype
+    return s:Tlist_Fix_Ftype(ftype)
 endfunction
 
 " Tlist_Get_Buffer_Filetype
@@ -984,12 +995,12 @@ function! s:Tlist_Get_Buffer_Filetype(bnum)
 
     if bufloaded(a:bnum)
         " For loaded buffers, the 'filetype' is already determined
-        return buf_ft
+        return s:Tlist_Fix_Ftype(buf_ft)
     endif
 
     " For unloaded buffers, if the 'filetype' option is set, return it
     if buf_ft != ''
-        return buf_ft
+        return s:Tlist_Fix_Ftype(buf_ft)
     endif
 
     " Skip non-existent buffers
