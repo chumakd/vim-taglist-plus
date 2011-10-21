@@ -422,6 +422,9 @@ let s:tlist_def_javascript_settings = 'javascript;f:function'
 " lisp language
 let s:tlist_def_lisp_settings = 'lisp;f:function'
 
+" clojure language
+let s:tlist_def_clojure_settings = 'lisp;f:function'
+
 " lua language
 let s:tlist_def_lua_settings = 'lua;f:function'
 
