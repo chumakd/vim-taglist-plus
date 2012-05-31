@@ -960,7 +960,7 @@ endfunction
 " will be returned
 function! s:Tlist_Fix_Ftype(raw_ftype)
     if match(a:raw_ftype, '\.')
-        return split(a:raw_ftype, '\.')[0]
+        return get(split(a:raw_ftype, '\.'), 0, a:raw_ftype)
     else
         return a:raw_ftype
     endif
