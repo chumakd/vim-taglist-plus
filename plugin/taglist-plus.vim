@@ -418,7 +418,7 @@ let s:tlist_def_fortran_settings = 'fortran;p:program;b:block data;' .
                     \ 'n:namelist;t:derived;v:variable;f:function;s:subroutine'
 
 " go language
-let s:tlist_def_go_settings = 'go;p:package;t:type;f:func;v:var;c:const'
+let s:tlist_def_go_settings ='go;f:function;p:package;t:struct;c:const;v:vars'
 
 " HTML language
 let s:tlist_def_html_settings = 'html;a:anchor;f:javascript function'
